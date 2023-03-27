@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from rest_framework.authtoken.admin import User
 from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Profile
 
@@ -33,6 +35,8 @@ class LoginView(APIView):
         return JsonResponse({'access_token': str(refresh.access_token)}, status=200)
 
 class ProfileView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     @login_required
     def get(self, request):
         profile = Profile.objects.get(user=request.user)
@@ -49,6 +53,8 @@ class ProfileView(APIView):
         return JsonResponse({'message': 'Profile updated successfully'}, status=200)
 
 class DeleteView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     @login_required
     def delete(self, request):
         request.user.delete()
